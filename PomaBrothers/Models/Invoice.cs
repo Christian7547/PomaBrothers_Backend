@@ -23,5 +23,5 @@ public partial class Invoice
     public int DeliveryDetailId { get; set; }
 
     [InverseProperty("Invoice")]
-    public virtual ICollection<DeliveryDetail> DeliveryDetails { get; set; } = new List<DeliveryDetail>();
+    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 }

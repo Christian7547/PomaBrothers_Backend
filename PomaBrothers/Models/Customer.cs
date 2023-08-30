@@ -40,5 +40,5 @@ public partial class Customer
     public DateTime RegisterDate { get; set; }
 
     [InverseProperty("Customer")]
-    public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
+    public virtual ICollection<Sale>? Sales { get; set; } = new List<Sale>();
 }

@@ -27,12 +27,12 @@ public partial class Sale
 
     [ForeignKey("CustomerId")]
     [InverseProperty("Sales")]
-    public virtual Customer Customer { get; set; } = null!;
+    public virtual Customer? Customer { get; set; } = null!;
 
     [ForeignKey("EmployeeId")]
     [InverseProperty("Sales")]
-    public virtual Employee Employee { get; set; } = null!;
+    public virtual Employee? Employee { get; set; } = null!;
 
     [InverseProperty("IdSaleNavigation")]
-    public virtual ICollection<SaleDetail> SaleDetails { get; set; } = new List<SaleDetail>();
+    public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();
 }

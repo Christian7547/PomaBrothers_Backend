@@ -33,5 +33,5 @@ public partial class Section
 
     [ForeignKey("WarehouseId")]
     [InverseProperty("Sections")]
-    public virtual Warehouse Warehouse { get; set; } = null!;
+    public virtual Warehouse? Warehouse { get; set; } = null!;
 }

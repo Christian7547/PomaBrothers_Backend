@@ -45,5 +45,5 @@ public partial class Supplier
     public DateTime RegisterDate { get; set; }
 
     [InverseProperty("Supplier")]
-    public virtual ICollection<DeliveryDetail> DeliveryDetails { get; set; } = new List<DeliveryDetail>();
+    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 }

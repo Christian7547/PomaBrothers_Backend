@@ -33,13 +33,13 @@ public partial class DeliveryDetail
 
     [ForeignKey("InvoiceId")]
     [InverseProperty("DeliveryDetails")]
-    public virtual Invoice Invoice { get; set; } = null!;
+    public virtual Invoice? Invoice { get; set; } = null!;
 
     [ForeignKey("ItemId")]
     [InverseProperty("DeliveryDetails")]
-    public virtual Item Item { get; set; } = null!;
+    public virtual Item? Item { get; set; } = null!;
 
     [ForeignKey("SupplierId")]
     [InverseProperty("DeliveryDetails")]
-    public virtual Supplier Supplier { get; set; } = null!;
+    public virtual Supplier? Supplier { get; set; } = null!;
 }

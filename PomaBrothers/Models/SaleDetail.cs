@@ -26,9 +26,9 @@ public partial class SaleDetail
 
     [ForeignKey("IdItem")]
     [InverseProperty("SaleDetails")]
-    public virtual Item IdItemNavigation { get; set; } = null!;
+    public virtual Item? IdItemNavigation { get; set; } = null!;
 
     [ForeignKey("IdSale")]
     [InverseProperty("SaleDetails")]
-    public virtual Sale IdSaleNavigation { get; set; } = null!;
+    public virtual Sale? IdSaleNavigation { get; set; } = null!;
 }

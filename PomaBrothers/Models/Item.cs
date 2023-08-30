@@ -67,14 +67,14 @@ public partial class Item
 
     [ForeignKey("CategoryId")]
     [InverseProperty("Items")]
-    public virtual Category Category { get; set; } = null!;
+    public virtual Category? Category { get; set; } = null!;
 
     [InverseProperty("Item")]
-    public virtual ICollection<DeliveryDetail> DeliveryDetails { get; set; } = new List<DeliveryDetail>();
+    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 
     [InverseProperty("IdItemNavigation")]
-    public virtual ICollection<SaleDetail> SaleDetails { get; set; } = new List<SaleDetail>();
+    public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();
 
     [InverseProperty("Item")]
-    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+    public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
 }
