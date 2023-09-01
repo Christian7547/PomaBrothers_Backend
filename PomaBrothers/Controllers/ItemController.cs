@@ -28,6 +28,18 @@ namespace PomaBrothers.Controllers
             return Ok("No logs");
         }
 
+        [HttpGet]
+        [Route("GetOne/{id:int}")]
+        public async Task<ActionResult<Item>> GetOne([FromRoute]int id)
+        {
+            var getItem = await FindById(id);
+            if (getItem != null)
+            {
+                return Ok(getItem);
+            }
+            return BadRequest();
+        }
+
         [HttpPost]
         [Route("New")]
         public async Task<IActionResult> New([FromBody]Item item)
@@ -37,7 +49,7 @@ namespace PomaBrothers.Controllers
                 if (item != null)
                 {
                     await _context.Items.AddAsync(item);
-                    var save = await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                     return CreatedAtAction("New", "Item", item);
                 }
                 throw new Exception("Internal server error");
@@ -50,15 +62,15 @@ namespace PomaBrothers.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(Item item)
+        public async Task<IActionResult> Edit([FromBody]Item item)
         {
             try
             {
                 var found = await FindById(item.Id);
                 if (found != null)
                 {
-                    found = item;
-                    _context.Items.Update(found);
+                    item.RegisterDate = found.RegisterDate; //The registerDate cannot be changed
+                    _context.Entry(found).CurrentValues.SetValues(item); //load the existing entity from the context ('found') using the same Id and then update the properties of that entity with the values of the 'item' object.
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
@@ -71,8 +83,8 @@ namespace PomaBrothers.Controllers
         }
 
         [HttpDelete]
-        [Route("Delete")]
-        public async Task<IActionResult> Delete(int id)
+        [Route("Remove/{id:int}")]
+        public async Task<IActionResult> Remove([FromRoute]int id)
         {
             try
             {
