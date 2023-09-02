@@ -26,6 +26,8 @@ public partial class PomaBrothersDbContext : DbContext
 
     public virtual DbSet<Item> Items { get; set; }
 
+    public virtual DbSet<ItemModel> Item_Model { get; set; }
+
     public virtual DbSet<Sale> Sales { get; set; }
 
     public virtual DbSet<SaleDetail> SaleDetails { get; set; }
@@ -67,7 +69,7 @@ public partial class PomaBrothersDbContext : DbContext
 
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.Property(e => e.IdEmployee).HasComment("Carnet de identidad");
+            entity.Property(e => e.Ci).HasComment("Carnet de identidad");
             entity.Property(e => e.RegisterDate).HasDefaultValueSql("(getdate())");
         });
 

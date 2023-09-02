@@ -18,100 +18,152 @@ namespace PomaBrothers.Controllers
 
         [HttpGet]
         [Route("GetMany")]
-        public async Task<ActionResult<List<Item>>> GetMany()
+        public async Task<IActionResult> GetMany()
         {
-            var query = await _context.Items.ToListAsync();
-            if (query != null)
+            List<Item> items = await _context.Items.ToListAsync();
+            if(items.Count == 0)
             {
-                return Ok(query);
+                return BadRequest();
             }
-            return Ok("No logs");
+            return Ok(items);
         }
 
         [HttpGet]
         [Route("GetOne/{id:int}")]
-        public async Task<ActionResult<Item>> GetOne([FromRoute]int id)
+        public async Task<ActionResult<Item>> GetOne(int id)
         {
-            var getItem = await FindById(id);
+            var getItem = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
             if (getItem != null)
             {
+                var getModel = await GetModel(getItem.ModelId);
+                getItem.ItemModel = getModel;
                 return Ok(getItem);
             }
-            return BadRequest();
+            return NotFound();
+        }
+
+        [HttpGet]
+        [Route("GetModels")]
+        public async Task<IActionResult> GetModels()
+        {
+            List<ItemModel> models = await _context.Item_Model.ToListAsync();
+            if (models.Count == 0)
+            {
+                return BadRequest();
+            }
+            return Ok(models);
         }
 
         [HttpPost]
         [Route("New")]
         public async Task<IActionResult> New([FromBody]Item item)
         {
-            try
+            if (item != null && item.ItemModel != null)
             {
-                if (item != null)
+                using(var transaction = _context.Database.BeginTransaction())
                 {
-                    await _context.Items.AddAsync(item);
-                    await _context.SaveChangesAsync();
-                    return CreatedAtAction("New", "Item", item);
+                    try
+                    {
+                        await _context.Item_Model.AddAsync(item.ItemModel);
+                        await _context.SaveChangesAsync();
+
+                        item.ModelId = item.ItemModel.Id;
+
+                        await _context.Items.AddAsync(item);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return CreatedAtAction("New", "Item", item);
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                    }
                 }
-                throw new Exception("Internal server error");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return BadRequest();
         }
 
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit([FromBody]Item item)
+        public async Task<IActionResult> Edit([FromBody] Item item)
         {
-            try
+            var getItem = await FindById(item.Id);
+            var getModel = await GetModel(item.ItemModel!.Id);
+            if (getItem != null && getModel != null)
             {
-                var found = await FindById(item.Id);
-                if (found != null)
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    item.RegisterDate = found.RegisterDate; //The registerDate cannot be changed
-                    _context.Entry(found).CurrentValues.SetValues(item); //load the existing entity from the context ('found') using the same Id and then update the properties of that entity with the values of the 'item' object.
-                    await _context.SaveChangesAsync();
-                    return NoContent();
+                    try
+                    {
+                        item.RegisterDate = getItem.RegisterDate; //The registerDate cannot be changed
+
+                        _context.Entry(getModel).CurrentValues.SetValues(item.ItemModel);
+                        await _context.SaveChangesAsync();
+
+                        _context.Entry(getItem).CurrentValues.SetValues(item); //load the existing entity from the context ('found') using the same Id and then update the properties of that entity with the values of the 'item' object.
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return NoContent();
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                    }
                 }
-                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return NotFound();
         }
 
         [HttpDelete]
         [Route("Remove/{id:int}")]
         public async Task<IActionResult> Remove([FromRoute]int id)
         {
-            try
+            var getItem = await FindById(id);
+            if(getItem != null)
             {
-                var found = await FindById(id);
-                if (found != null)
+                var getModel = await GetModel(getItem.ModelId);
+                using(var transaction = _context.Database.BeginTransaction())
                 {
-                    _context.Items.Remove(found);
-                    await _context.SaveChangesAsync();
-                    return NoContent();
+                    try
+                    {
+                        _context.Items.Remove(getItem);
+                        _context.Item_Model.Remove(getModel);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return NoContent();
+                    }
+                    catch(Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                    }
                 }
-                return NotFound();
-
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return NotFound();
         }
 
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)] //Indicates that Swagger does not generate documentation for this method
         public async Task<Item> FindById(int id)
         {
-            var query = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
-            if (query != null)
+            var find = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
+            if (find != null)
             {
-                return query;
+                return find;
+            }
+            return null!;
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<ItemModel> GetModel(int id)
+        {
+            var find = await _context.Item_Model.FirstOrDefaultAsync(x => x.Id == id);
+            if (find != null)
+            {
+                return find;
             }
             return null!;
         }

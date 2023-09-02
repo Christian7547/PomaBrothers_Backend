@@ -31,10 +31,10 @@ public partial class Employee
     /// <summary>
     /// Carnet de identidad
     /// </summary>
-    [Column("idEmployee")]
+    [Column("ci")]
     [StringLength(20)]
     [Unicode(false)]
-    public string IdEmployee { get; set; } = null!;
+    public string Ci { get; set; } = null!;
 
     [Column("phone")]
     [StringLength(10)]
