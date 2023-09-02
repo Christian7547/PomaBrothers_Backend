@@ -143,7 +143,7 @@ namespace PomaBrothers.Controllers
             }
             return NotFound();
         }
-
+        //busca un elemento (o registro) en la base de datos utilizando el Entity Framework Core
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)] //Indicates that Swagger does not generate documentation for this method
         public async Task<Item> FindById(int id)
