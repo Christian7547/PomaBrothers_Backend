@@ -123,7 +123,7 @@ public partial class PomaBrothersDbContext : DbContext
 
         modelBuilder.Entity<Supplier>(entity =>
         {
-            entity.Property(e => e.IdSupplier).HasComment("Carnet de identidad");
+            entity.Property(e => e.Ci).HasComment("Carnet de identidad");
             entity.Property(e => e.RegisterDate).HasDefaultValueSql("(getdate())");
         });
 
