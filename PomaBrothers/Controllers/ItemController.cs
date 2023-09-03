@@ -43,6 +43,18 @@ namespace PomaBrothers.Controllers
         }
 
         [HttpGet]
+        [Route("FilterByCategory/{id:int}")]
+        public async Task<ActionResult<List<Item>>> FilterByCategory(int id)
+        {
+            var sendItems = await _context.Items.Where(s => s.CategoryId.Equals(id)).ToListAsync();
+            if(sendItems != null)
+            {
+                return Ok(sendItems);
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
         [Route("GetModels")]
         public async Task<IActionResult> GetModels()
         {
@@ -143,6 +155,7 @@ namespace PomaBrothers.Controllers
             }
             return NotFound();
         }
+
         //busca un elemento (o registro) en la base de datos utilizando el Entity Framework Core
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)] //Indicates that Swagger does not generate documentation for this method
