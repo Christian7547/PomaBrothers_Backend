@@ -7,11 +7,11 @@ namespace PomaBrothers.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ItemController : ControllerBase
+    public class ItemModelController : Controller
     {
         private readonly PomaBrothersDbContext _context;
 
-        public ItemController(PomaBrothersDbContext context)
+        public ItemModelController(PomaBrothersDbContext context)
         {
             _context = context;
         }
@@ -20,49 +20,37 @@ namespace PomaBrothers.Controllers
         [Route("GetMany")]
         public async Task<IActionResult> GetMany()
         {
-            List<Item> items = await _context.Items.ToListAsync();
-            if(items.Count == 0)
+            List<ItemModel> models = await _context.Item_Model.ToListAsync();
+            if (models.Count == 0)
             {
                 return BadRequest();
             }
-            return Ok(items);
+            return Ok(models);
         }
 
         [HttpGet]
         [Route("GetOne/{id:int}")]
-        public async Task<ActionResult<Item>> GetOne(int id)
+        public async Task<ActionResult<ItemModel>> GetOne(int id)
         {
-            var getItem = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
-            if (getItem != null)
+            var getModel = await _context.Item_Model.FirstOrDefaultAsync(x => x.Id == id);
+            if (getModel != null)
             {
-                return Ok(getItem);
-            }
-            return NotFound();
-        }
-
-        [HttpGet]
-        [Route("FilterByCategory/{id:int}")]
-        public async Task<ActionResult<List<Item>>> FilterByCategory(int id)
-        {
-            var sendItems = await _context.Items.Where(s => s.CategoryId.Equals(id)).ToListAsync();
-            if(sendItems != null)
-            {
-                return Ok(sendItems);
+                return Ok(getModel);
             }
             return NotFound();
         }
 
         [HttpPost]
         [Route("New")]
-        public async Task<IActionResult> New([FromBody]Item item)
+        public async Task<IActionResult> New([FromBody]ItemModel model)
         {
-            if (item != null)
+            if (model != null)
             {
                 try
                 {
-                    await _context.Items.AddAsync(item);
+                    await _context.Item_Model.AddAsync(model!);
                     await _context.SaveChangesAsync();
-                    return CreatedAtAction("New", "Item", item);
+                    return CreatedAtAction("New", "ItemModel", model);
                 }
                 catch (Exception ex)
                 {
@@ -74,15 +62,14 @@ namespace PomaBrothers.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit([FromBody] Item item)
+        public async Task<IActionResult> Edit([FromBody]ItemModel model)
         {
-            var getItem = await FindById(item.Id);
-            if (getItem != null)
+            var getModel = await FindById(model.Id);
+            if (getModel != null)
             {
                 try
                 {
-                    item.RegisterDate = getItem.RegisterDate; //The registerDate cannot be changed
-                    _context.Entry(getItem).CurrentValues.SetValues(item); //load the existing entity from the context ('found') using the same Id and then update the properties of that entity with the values of the 'item' object.
+                    _context.Entry(getModel).CurrentValues.SetValues(model);
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
@@ -96,14 +83,14 @@ namespace PomaBrothers.Controllers
 
         [HttpDelete]
         [Route("Remove/{id:int}")]
-        public async Task<IActionResult> Remove([FromRoute]int id)
+        public async Task<IActionResult> Remove([FromRoute] int id)
         {
-            var getItem = await FindById(id);
-            if(getItem != null)
+            var getModel = await FindById(id);
+            if (getModel != null)
             {
                 try
                 {
-                    _context.Items.Remove(getItem);
+                    _context.Item_Model.Remove(getModel);
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
@@ -116,10 +103,26 @@ namespace PomaBrothers.Controllers
         }
 
         [HttpGet]
-        [ApiExplorerSettings(IgnoreApi = true)] //Indicates that Swagger does not generate documentation for this method
-        public async Task<Item> FindById(int id)
+        [Route("SearchModel/{likeModel}")]
+        public async Task<ActionResult<List<ItemModel>>> SearchModel([FromRoute]string likeModel)
         {
-            var find = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
+            var results = await _context.Item_Model.Where(f => f.ModelName.Contains(likeModel) || f.Marker.Contains(likeModel))
+                .Select(model => new ItemModel 
+                {
+                    ModelName = model.ModelName,
+                    Marker = model.Marker,
+                    Id = model.Id, 
+                    CapacityOrSize = model.CapacityOrSize
+                })
+                .ToListAsync();
+            return Ok(results);
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<ItemModel> FindById(int id)
+        {
+            var find = await _context.Item_Model.FirstOrDefaultAsync(x => x.Id == id);
             if (find != null)
             {
                 return find;

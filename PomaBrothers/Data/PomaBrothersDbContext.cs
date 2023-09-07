@@ -81,7 +81,6 @@ public partial class PomaBrothersDbContext : DbContext
         modelBuilder.Entity<Item>(entity =>
         {
             entity.Property(e => e.RegisterDate).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Warranty).HasComment("Años de garantía");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Items)
                 .OnDelete(DeleteBehavior.ClientSetNull)
