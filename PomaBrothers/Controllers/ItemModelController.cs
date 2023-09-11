@@ -44,6 +44,8 @@ namespace PomaBrothers.Controllers
         [Route("New")]
         public async Task<IActionResult> New([FromBody]ItemModel model)
         {
+            if (model.CapacityOrSize == 0)
+                model.CapacityOrSize = null;
             if (model != null)
             {
                 try
