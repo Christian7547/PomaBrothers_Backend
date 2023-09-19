@@ -113,7 +113,7 @@ public partial class PomaBrothersDbContext : DbContext
 
         modelBuilder.Entity<Section>(entity =>
         {
-            entity.HasOne(d => d.Item).WithMany(p => p.Sections)
+            entity.HasOne(d => d.ItemModel).WithMany(p => p.Sections)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Section_Item");
 

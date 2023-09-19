@@ -64,7 +64,4 @@ public partial class Item
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();
-
-    [InverseProperty("Item")]
-    public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
 }

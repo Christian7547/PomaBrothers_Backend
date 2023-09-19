@@ -21,5 +21,8 @@ namespace PomaBrothers.Models
 
         [StringLength(50)]
         public string? MeasurementUnit { get; set; }
+
+        [InverseProperty("ItemModel")]
+        public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
     }
 }
