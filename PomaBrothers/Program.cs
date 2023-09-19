@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace PomaBrothers
 {
@@ -11,6 +12,8 @@ namespace PomaBrothers
 
             builder.Services.AddDbContext<PomaBrothersDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<PomaBrothersDbContext>();
 
             // Add services to the container.
 
