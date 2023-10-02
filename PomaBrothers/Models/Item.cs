@@ -35,13 +35,13 @@ public partial class Item
     [Unicode(false)]
     public string Color { get; set; } = null!;
 
-    [Column("durationWarranty")]
-    public byte DurationWarranty { get; set; }
-
-    [Column("typeWarranty")]
-    [StringLength(5)]
+    /// <summary>
+    /// Años de garantía
+    /// </summary>
+    [Column("warranty")]
+    [StringLength(10)]
     [Unicode(false)]
-    public string TypeWarranty { get; set; } = null!;
+    public string Warranty { get; set; } = null!;
 
     [Column("categoryId")]
     public int CategoryId { get; set; }
