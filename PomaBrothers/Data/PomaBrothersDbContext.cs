@@ -14,8 +14,6 @@ public partial class PomaBrothersDbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Config> Configs { get; set; }
-
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<DeliveryDetail> DeliveryDetails { get; set; }

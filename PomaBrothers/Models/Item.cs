@@ -50,6 +50,9 @@ public partial class Item
     [Column("modelId")]
     public int ModelId { get; set; }
 
+    [Column("urlImage")]
+    public string? UrlImage { get; set; }
+
     [ForeignKey("CategoryId")]
     [InverseProperty("Items")]
     public virtual Category? Category { get; set; } = null!;
