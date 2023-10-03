@@ -59,6 +59,11 @@ public partial class Employee
     [Column("registerDate", TypeName = "datetime")]
     public DateTime RegisterDate { get; set; }
 
+    [Column("urlImage")]
+    [StringLength(500)]
+    [Unicode(false)]
+    public string? UrlImage { get; set; }
+
     [InverseProperty("Employee")]
     public virtual ICollection<Sale>? Sales { get; set; } = new List<Sale>();
 }
