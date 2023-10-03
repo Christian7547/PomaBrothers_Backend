@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace PomaBrothers.Models;
 
@@ -17,9 +14,6 @@ public partial class SaleDetail
 
     [Column("idItem")]
     public int IdItem { get; set; }
-
-    [Column("quantity")]
-    public int Quantity { get; set; }
 
     [Column("subtotal", TypeName = "decimal(8, 2)")]
     public decimal Subtotal { get; set; }

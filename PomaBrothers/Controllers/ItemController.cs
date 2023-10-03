@@ -99,20 +99,21 @@ namespace PomaBrothers.Controllers
         public async Task<IActionResult> Remove([FromRoute]int id)
         {
             var getItem = await FindById(id);
-            if(getItem != null)
+            var details = _context.DeliveryDetails.Where(d => d.ItemId == getItem.Id);
+            if (details.Count() > 0)
             {
-                try
-                {
-                    _context.Items.Remove(getItem);
-                    await _context.SaveChangesAsync();
-                    return NoContent();
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
+                _context.DeliveryDetails.Remove(details.First());
+                _context.Items.Remove(getItem);
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
-            return NotFound();
+            else
+            {
+                _context.Items.Remove(getItem!);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
         }
 
         [HttpGet]
