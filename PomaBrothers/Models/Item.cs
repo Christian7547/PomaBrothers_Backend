@@ -42,7 +42,7 @@ public partial class Item
     [StringLength(5)]
     [Unicode(false)]
     public string TypeWarranty { get; set; } = null!;
-
+     
     [Column("categoryId")]
     public int CategoryId { get; set; }
 
