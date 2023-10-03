@@ -18,5 +18,5 @@ public partial class Warehouse
     public string Name { get; set; } = null!;
 
     [InverseProperty("Warehouse")]
-    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+    public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
 }

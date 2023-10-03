@@ -36,14 +36,14 @@ public partial class Supplier
     /// <summary>
     /// Carnet de identidad
     /// </summary>
-    [Column("idSupplier")]
+    [Column("ci")]
     [StringLength(50)]
     [Unicode(false)]
-    public string IdSupplier { get; set; } = null!;
+    public string Ci { get; set; } = null!;
 
     [Column("registerDate", TypeName = "datetime")]
     public DateTime RegisterDate { get; set; }
 
     [InverseProperty("Supplier")]
-    public virtual ICollection<DeliveryDetail> DeliveryDetails { get; set; } = new List<DeliveryDetail>();
+    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 }
