@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,15 +50,15 @@ public partial class Item
     [Column("modelId")]
     public int ModelId { get; set; }
 
+    [Column("urlImage")]
+    public string? UrlImage { get; set; }
+
     [ForeignKey("CategoryId")]
     [InverseProperty("Items")]
     public virtual Category? Category { get; set; } = null!;
 
     [ForeignKey("ModelId")]
     public virtual ItemModel? ItemModel { get; set; } = null!;
-
-    [InverseProperty("Item")]
-    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();

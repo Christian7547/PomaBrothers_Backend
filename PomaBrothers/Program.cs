@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace PomaBrothers
 {
@@ -12,8 +13,9 @@ namespace PomaBrothers
             builder.Services.AddDbContext<PomaBrothersDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add services to the container.
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<PomaBrothersDbContext>();
 
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
