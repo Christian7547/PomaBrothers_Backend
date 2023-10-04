@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace PomaBrothers.Models;
 
@@ -13,14 +10,17 @@ public partial class Invoice
     [Column("id")]
     public int Id { get; set; }
 
+    [Column("supplierId")]
+    public int SupplierId { get; set; }
+
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; }
+    public DateTime RegisterDate { get; set; } = DateTime.Now;
 
     [Column("total", TypeName = "decimal(8, 2)")]
     public decimal Total { get; set; }
 
-    [Column("deliveryDetailId")]
-    public int DeliveryDetailId { get; set; }
+    [ForeignKey("SupplierId")]
+    public virtual Supplier? Supplier { get; set; }
 
     [InverseProperty("Invoice")]
     public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
