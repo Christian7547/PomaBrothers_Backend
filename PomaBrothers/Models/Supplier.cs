@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,5 +43,5 @@ public partial class Supplier
     public DateTime RegisterDate { get; set; }
 
     [InverseProperty("Supplier")]
-    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
+    public virtual ICollection<Invoice>? Invoices { get; set; } = new List<Invoice>();
 }

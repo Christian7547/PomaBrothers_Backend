@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
+using Firebase.Auth;
+using Firebase.Storage;
 
 namespace PomaBrothers.Controllers
 {
@@ -86,13 +88,14 @@ namespace PomaBrothers.Controllers
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'PomaBrothersDbContext.Employees'  is null.");
-          }
+            
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'PomaBrothersDbContext.Employees'  is null.");
+            }
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
-
+            
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
         }
 

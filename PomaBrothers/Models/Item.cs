@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,13 +33,13 @@ public partial class Item
     [Unicode(false)]
     public string Color { get; set; } = null!;
 
-    /// <summary>
-    /// Años de garantía
-    /// </summary>
-    [Column("warranty")]
-    [StringLength(10)]
+    [Column("durationWarranty")]
+    public byte DurationWarranty { get; set; }
+
+    [Column("typeWarranty")]
+    [StringLength(5)]
     [Unicode(false)]
-    public string Warranty { get; set; } = null!;
+    public string TypeWarranty { get; set; } = null!;
 
     [Column("categoryId")]
     public int CategoryId { get; set; }
@@ -52,6 +50,9 @@ public partial class Item
     [Column("modelId")]
     public int ModelId { get; set; }
 
+    [Column("urlImage")]
+    public string? UrlImage { get; set; }
+
     [ForeignKey("CategoryId")]
     [InverseProperty("Items")]
     public virtual Category? Category { get; set; } = null!;
@@ -59,12 +60,6 @@ public partial class Item
     [ForeignKey("ModelId")]
     public virtual ItemModel? ItemModel { get; set; } = null!;
 
-    [InverseProperty("Item")]
-    public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
-
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();
-
-    [InverseProperty("Item")]
-    public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
 }

@@ -17,9 +17,12 @@ namespace PomaBrothers.Models
         [Unicode(false)]
         public string Marker { get; set; } = null!;
     
-        public int CapacityOrSize { get; set; }
+        public int? CapacityOrSize { get; set; }
 
         [StringLength(50)]
-        public string MeasurementUnit { get; set; }
+        public string? MeasurementUnit { get; set; }
+
+        [InverseProperty("ItemModel")]
+        public virtual ICollection<Section>? Sections { get; set; } = new List<Section>();
     }
 }
