@@ -14,7 +14,7 @@ public partial class Invoice
     public int SupplierId { get; set; }
 
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; }
+    public DateTime RegisterDate { get; set; } = DateTime.Now;
 
     [Column("total", TypeName = "decimal(8, 2)")]
     public decimal Total { get; set; }

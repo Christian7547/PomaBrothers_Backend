@@ -45,7 +45,7 @@ public partial class Item
     public int CategoryId { get; set; }
 
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; }
+    public DateTime RegisterDate { get; set; } = DateTime.Now;
 
     [Column("modelId")]
     public int ModelId { get; set; }
