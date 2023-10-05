@@ -35,7 +35,7 @@ namespace PomaBrothers.Controllers
                 invoice.Supplier = group.Select(g => g.Supplier).First();
                 invoices.Add(invoice);
             }
-            return Ok(invoices);
+            return Ok(invoices.OrderByDescending(i => i.RegisterDate));
         }
 
         [HttpGet]
