@@ -14,7 +14,7 @@ public partial class Invoice
     public int SupplierId { get; set; }
 
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; } = DateTime.Now;
+    public DateTime RegisterDate { get; set; }
 
     [Column("total", TypeName = "decimal(8, 2)")]
     public decimal Total { get; set; }
@@ -22,6 +22,5 @@ public partial class Invoice
     [ForeignKey("SupplierId")]
     public virtual Supplier? Supplier { get; set; }
 
-    [InverseProperty("Invoice")]
     public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 }

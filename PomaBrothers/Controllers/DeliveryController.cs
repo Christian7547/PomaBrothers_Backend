@@ -21,25 +21,89 @@ namespace PomaBrothers.Controllers
         [Route("GetMany")]
         public async Task<IActionResult> GetMany()
         {
-            List<Item> items = new();
-            var query = await _context.Invoices.Join(_context.DeliveryDetails.Join(_context.Items, d => d.ItemId, i => i.Id,
-                (d, i) => new
+            var getInvoices = await JoinItemsWithInvoices();
+            var query = getInvoices.Join(_context.Suppliers, gi => gi.SupplierId, s => s.Id,
+                (gi, s) => new
                 {
-                    Item = i,
-                    InvoiceID = d.InvoiceId,
-                    purchasePrice = d.PurchasePrice
-                }), i => i.Id, d => d.InvoiceID, 
-                (i, d) => new
+                    Invoice = gi,
+                    Supplier = s
+                }).GroupBy(q => q.Invoice.Id).ToList();
+            List<Invoice> invoices = new();
+            foreach (var group in query)
+            {
+                var invoice = group.First().Invoice;
+                invoice.Supplier = group.Select(g => g.Supplier).First();
+                invoices.Add(invoice);
+            }
+            return Ok(invoices);
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<List<Invoice>> JoinItemsWithInvoices()
+        {
+            var getItems = await JoinItemsWithModels();
+            var getInvoices = await GetInvoicesWithDetails();
+            foreach (var invoice in getInvoices)
+            {
+                var query = invoice.DeliveryDetails!.Join(getItems, dd => dd.ItemId, i => i.Id,
+                    (dd, i) => new DeliveryDetail
+                    {
+                        PurchasePrice = dd.PurchasePrice,
+                        Item = i
+                    }).ToList();
+                invoice.DeliveryDetails = query;
+            }
+            return getInvoices;
+        } 
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<List<Invoice>> GetInvoicesWithDetails()
+        {
+            List<Invoice> invoices = new();
+            var query = await _context.Invoices.Join(_context.DeliveryDetails, i => i.Id, dd => dd.InvoiceId,
+                (i, dd) => new 
                 {
-                    item = d.Item,
-                    price = d.purchasePrice,
-                    Register = i.RegisterDate,
-                    TotalInvoice = i.Total,
-                    list = items
+                    Invoice = i,
+                    Details = dd
+                }).GroupBy(q => q.Invoice.Id).ToListAsync();
+            foreach(var group in query)
+            {
+                var invoice = group.First().Invoice;
+                invoice.DeliveryDetails = group.Select(g => g.Details).ToList();
+                invoices.Add(invoice);
+            }
+            return invoices;    
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<List<Item>> JoinItemsWithModels()
+        {
+            var items = new List<Item>();
+            var query = await _context.Items.Join(_context.Item_Model, i => i.ModelId, im => im.Id,
+                (i, im) => new 
+                {
+                    id = i.Id,
+                    name = i.Name,
+                    serie = i.Serie,
+                    modelName = im.ModelName,
+                    marker = im.Marker
                 }).ToListAsync();
             foreach (var i in query)
-                items.Add(i.item);
-            return Ok(query);
+                items.Add(new Item
+                {
+                    Id = i.id,
+                    Name = i.name,
+                    Serie = i.serie,
+                    ItemModel = new ItemModel
+                    {
+                        ModelName = i.modelName,
+                        Marker = i.marker
+                    }
+                });
+            return items;
         }
 
         [HttpPost]
