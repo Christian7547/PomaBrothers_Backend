@@ -22,6 +22,5 @@ public partial class Invoice
     [ForeignKey("SupplierId")]
     public virtual Supplier? Supplier { get; set; }
 
-    [InverseProperty("Invoice")]
     public virtual ICollection<DeliveryDetail>? DeliveryDetails { get; set; } = new List<DeliveryDetail>();
 }

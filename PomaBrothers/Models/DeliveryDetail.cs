@@ -19,7 +19,5 @@ public partial class DeliveryDetail
     [Column("purchasePrice", TypeName = "decimal(8, 2)")]
     public decimal PurchasePrice { get; set; }
 
-    [ForeignKey("InvoiceId")]
-    [InverseProperty("DeliveryDetails")]
-    public virtual Invoice? Invoice { get; set; } = null!;
+    public virtual Item? Item { get; set; }
 }

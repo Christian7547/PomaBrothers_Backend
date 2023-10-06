@@ -41,7 +41,4 @@ public partial class Supplier
 
     [Column("registerDate", TypeName = "datetime")]
     public DateTime RegisterDate { get; set; }
-
-    [InverseProperty("Supplier")]
-    public virtual ICollection<Invoice>? Invoices { get; set; } = new List<Invoice>();
 }
