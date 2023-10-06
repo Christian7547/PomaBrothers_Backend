@@ -44,6 +44,9 @@ public partial class Item
     [Column("categoryId")]
     public int CategoryId { get; set; }
 
+    [Column("status")]
+    public byte Status { get; set; }
+
     [Column("registerDate", TypeName = "datetime")]
     public DateTime RegisterDate { get; set; } = DateTime.Now;
 

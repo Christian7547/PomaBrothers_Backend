@@ -20,7 +20,7 @@ namespace PomaBrothers.Controllers
         [Route("GetMany")]
         public async Task<IActionResult> GetMany()
         {
-            List<Item> items = await _context.Items.ToListAsync();
+            List<Item> items = await _context.Items.Where(i => i.Status.Equals(1)).ToListAsync();
             if(items.Count == 0)
             {
                 return BadRequest();
@@ -99,21 +99,21 @@ namespace PomaBrothers.Controllers
         public async Task<IActionResult> Remove([FromRoute]int id)
         {
             var getItem = await FindById(id);
-            var details = _context.DeliveryDetails.Where(d => d.ItemId == getItem.Id);
-            if (details.Count() > 0)
+            if(getItem != null)
             {
-                _context.DeliveryDetails.Remove(details.First());
-                _context.Items.Remove(getItem);
-                await _context.SaveChangesAsync();
-                return NoContent();
+                try
+                {
+                    getItem.Status = 0;
+                    _context.Entry(getItem).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    return NoContent();
+                }
+                catch(Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            else
-            {
-                _context.Items.Remove(getItem!);
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-
+            return NotFound();
         }
 
         [HttpGet]
