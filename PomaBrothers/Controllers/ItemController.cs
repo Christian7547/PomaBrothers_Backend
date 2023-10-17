@@ -40,38 +40,6 @@ namespace PomaBrothers.Controllers
             return NotFound();
         }
 
-        [HttpGet]
-        [Route("FilterByCategory/{id:int}")]
-        public async Task<ActionResult<List<Item>>> FilterByCategory(int id)
-        {
-            var sendItems = await _context.Items.Where(s => s.CategoryId.Equals(id)).ToListAsync();
-            if(sendItems != null)
-            {
-                return Ok(sendItems);
-            }
-            return NotFound();
-        }
-
-        [HttpPost]
-        [Route("New")]
-        public async Task<IActionResult> New([FromBody]Item item)
-        {
-            if (item != null)
-            {
-                try
-                {
-                    await _context.Items.AddAsync(item);
-                    await _context.SaveChangesAsync();
-                    return CreatedAtAction("New", "Item", item);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
-            }
-            return BadRequest();
-        }
-
         [HttpPut]
         [Route("Edit")]
         public async Task<IActionResult> Edit([FromBody] Item item)
