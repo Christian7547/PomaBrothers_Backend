@@ -124,11 +124,14 @@ namespace PomaBrothers.Controllers
                 await _context.SaveChangesAsync();
                 for (int i = 0; i < deliveryDTO.PurchasePrices.Count; i++)
                 {
+
                     modelsId.Add(deliveryDTO.Items[i].ModelId);
                     details.Add(new DeliveryDetail()
                     {
+                        
                         ItemId = deliveryDTO.Items[i].Id,
                         PurchasePrice = deliveryDTO.PurchasePrices[i]
+
                     });
                 }
                 await _context.Invoices.AddAsync(invoice);
