@@ -28,18 +28,6 @@ namespace PomaBrothers.Controllers
             return BadRequest();
         }
 
-        [HttpGet]
-        [Route("GetOne/{id:int}")]
-        public async Task<ActionResult<Warehouse>> GetOne(int id)
-        {
-            var warehouse = await FindById(id);
-            if(warehouse != null)
-            {
-                return Ok(warehouse);
-            }
-            return NotFound();
-        }
-
         [HttpPost]
         [Route("New")]
         public async Task<IActionResult> New([FromBody]Warehouse warehouse)
@@ -83,23 +71,13 @@ namespace PomaBrothers.Controllers
 
         [HttpGet]
         [Route("GetContentWarehouse/{id:int}")]
-        public async Task<ActionResult<List<ItemModel>>> GetContentWarehouse([FromRoute]int id) //id of Warehouse
+        public async Task<ActionResult<List<Section>>> GetContentWarehouse([FromRoute]int id) //id of Warehouse
         {
-            List<ItemModel> models = new();
-            var query = await _context.Sections.Join(_context.Item_Model, s => s.ModelId, im => im.Id,
-                (s, im) => new
-                {
-                    WarehouseID = s.WarehouseId,
-                    Model = im,
-                    Quantity = s.ModelQuantity
-                }).Where(q => q.WarehouseID.Equals(id)).ToListAsync();
-            if(query.Count > 0)
-            {
-                foreach (var item in query)
-                    models.Add(item.Model);
-                return Ok(models);
-            }
-            return null!;
+            var query = await _context.Sections
+                .Include(s => s.ItemModel)
+                .Where(s => s.WarehouseId.Equals(id))
+                .ToListAsync();
+            return Ok(query);
         }
 
         [HttpGet]
