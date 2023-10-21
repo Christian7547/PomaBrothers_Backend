@@ -62,7 +62,4 @@ public partial class Item
 
     [ForeignKey("ModelId")]
     public virtual ItemModel? ItemModel { get; set; } = null!;
-
-    [InverseProperty("IdItemNavigation")]
-    public virtual ICollection<SaleDetail>? SaleDetails { get; set; } = new List<SaleDetail>();
 }

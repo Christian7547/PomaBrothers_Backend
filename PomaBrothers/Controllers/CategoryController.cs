@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
@@ -24,29 +23,23 @@ namespace PomaBrothers.Controllers
             var query = await _context.Categories.ToListAsync();
             if (query != null)
             {
-                return Ok(query);
+                return Ok(query.OrderBy(c => c.Name));
             }
-            return Ok("No logs");
+            return NotFound();
         }
 
-        [HttpPost]
-        [Route("New")]
-        public async Task<IActionResult> New(Category category)
+        [HttpGet]
+        [Route("FilterByCategory/{id:int}")]
+        public async Task<IActionResult> FilterByCategory(int id)
         {
-            try
+            var sendItems = await _context.Items.Include(i => i.ItemModel)
+                .Where(i => i.CategoryId == id && i.Status == 1)
+                .ToListAsync();   
+            if(sendItems.Count > 0)
             {
-                if(category != null)
-                {
-                    await _context.Categories.AddAsync(category);
-                    var save = await _context.SaveChangesAsync();
-                    return CreatedAtAction("New", "Category", category);
-                }
-                throw new Exception("Internal Server Error");
+                return Ok(sendItems);
             }
-            catch(Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return NotFound();
         }
     }
 }

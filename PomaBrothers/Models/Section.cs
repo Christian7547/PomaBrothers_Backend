@@ -23,7 +23,6 @@ public partial class Section
     public int ModelQuantity { get; set; }
 
     [ForeignKey("ModelId")]
-    [InverseProperty("Sections")]
     public virtual ItemModel? ItemModel { get; set; } = null!;
 
     [ForeignKey("WarehouseId")]
