@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using Microsoft.AspNetCore.Identity;
+using PomaBrothers.Reports.Interfaces;
+using PomaBrothers.Reports.Implementation;
 
 namespace PomaBrothers
 {
@@ -20,6 +22,8 @@ namespace PomaBrothers
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IDeliveryReportsService, DeliveryReportsService>();
 
             var app = builder.Build();
 

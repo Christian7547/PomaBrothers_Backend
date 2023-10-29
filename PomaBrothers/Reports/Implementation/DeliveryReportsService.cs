@@ -1,0 +1,137 @@
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
+using PomaBrothers.Data;
+using PomaBrothers.Models;
+using PomaBrothers.Models.DTOModels;
+using PomaBrothers.Reports.Interfaces;
+
+namespace PomaBrothers.Reports.Implementation               
+{
+    public class DeliveryReportsService : IDeliveryReportsService
+    {
+        private readonly PomaBrothersDbContext _context;
+        private ProductSupplierDTO? _productSupplierDTO;
+
+        public DeliveryReportsService(PomaBrothersDbContext context) => _context = context;
+
+        #region OrdersDateRange
+        public async Task<List<DeliveryDetail>> OrdersByDateRangeReport(DateTime startDate, DateTime endDate)
+        {
+            DateTime start = new DateTime(startDate.Year, startDate.Day, startDate.Month);
+            DateTime end = new DateTime(endDate.Year, endDate.Day, endDate.Month + 1);
+            var getItems = await _context.Items
+                .Where(i => i.RegisterDate.CompareTo(start) >= 0 && i.RegisterDate.CompareTo(end) < 0 && i.Status != 0)
+                .ToListAsync();
+            var modelsWithItems = GetModels(getItems);
+            return GetItemsWithPurchasePrices(modelsWithItems);
+        }
+
+        public List<DeliveryDetail> GetItemsWithPurchasePrices(List<Item> items)
+        {
+            var list = new List<DeliveryDetail>();
+            var query = items.Join(_context.DeliveryDetails, i => i.Id, dd => dd.ItemId, 
+                (i, dd) => new DeliveryDetail
+                {
+                    PurchasePrice = dd.PurchasePrice,
+                    Item = i
+                }).ToList();
+            return query!;
+        }
+
+        public List<Item> GetModels(List<Item> items)
+        {
+            var models = items.Join(_context.Item_Model, i => i.ModelId, im => im.Id,
+                (i, im) => new Item
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    Serie = i.Serie,
+                    ItemModel = new ItemModel
+                    {
+                        ModelName = im.ModelName,
+                        Marker = im.Marker,
+                    }
+                }).ToList();
+            return models;
+        }
+        #endregion
+
+        #region ItemWithSupplier
+        public async Task<DeliveryDetail> GetDetails(int productId)
+        {
+            var getDetail = await _context.DeliveryDetails.Where(dd => dd.ItemId == productId)
+                .Select(detail => new DeliveryDetail
+                {
+                    InvoiceId = detail.InvoiceId,
+                    PurchasePrice = detail.PurchasePrice
+                }).FirstOrDefaultAsync();
+            return getDetail!;
+        }
+
+        public async Task<Supplier> GetSupplierAsync(int invoiceId)
+        {
+            var getInvoice = await _context.Suppliers.Join(_context.Invoices, s => s.Id, i => i.SupplierId, 
+                (s, i) => new
+                {
+                    Supplier = new Supplier { BussinesName = s.BussinesName, Phone = s.Phone, Ci = s.Ci, Manager = s.Manager, Address = s.Address},
+                    InvoiceID = i.Id
+                }).Where(s => s.InvoiceID.Equals(invoiceId)).FirstOrDefaultAsync();
+            var supplier = getInvoice?.Supplier;    
+            return supplier!;
+        }
+
+        public async Task<Item> GetItemAsync(int productId)
+        {
+            var getItem = await _context.Items.Where(i => i.Id.Equals(productId))
+                .Select(item => new Item
+                {
+                    Name = item.Name,
+                    Serie = item.Serie,
+                    Description = item.Description,
+                    DurationWarranty = item.DurationWarranty,
+                    TypeWarranty = item.TypeWarranty,
+                    RegisterDate = item.RegisterDate,
+                    ModelId = item.ModelId
+                }).FirstOrDefaultAsync();
+            return getItem!;
+        }
+
+        public async Task<ItemModel> GetModelAsync(int modelId)
+        {
+            var getModel = await _context.Item_Model.Where(m => m.Id.Equals(modelId))
+                .Select(model => new ItemModel
+                {
+                    ModelName = model.ModelName,
+                    Marker = model.Marker
+                }).FirstOrDefaultAsync();
+            return getModel!;
+        }
+
+        public async Task<ProductSupplierDTO> GetProductSupplier(int productId)
+        {
+            var detail = await GetDetails(productId);
+            var supplier = await GetSupplierAsync(detail.InvoiceId);
+            var item = await GetItemAsync(productId);
+            var model = await GetModelAsync(item.ModelId);
+            _productSupplierDTO = new()
+            {
+                PurchasePrice = detail.PurchasePrice,
+                BussinesName = supplier.BussinesName,
+                SupplierPhone = supplier.Phone,
+                Manager = supplier.Manager,
+                SupplierAddress = supplier.Address,
+                SupplierNit = supplier.Ci,
+                ItemName = item.Name,
+                Serie = item.Serie,
+                ItemDescription = item.Description,
+                DurationWarranty = item.DurationWarranty,
+                TypeWarranty = item.TypeWarranty,
+                RegisterDateItem = item.RegisterDate,
+                ItemModelName = model.ModelName,
+                ItemMarker = model.Marker
+            };
+            return _productSupplierDTO;
+        }
+        #endregion
+    }
+}

@@ -39,7 +39,7 @@ namespace PomaBrothers.Controllers
             {
                 return Ok(sendItems);
             }
-            return NotFound();
+            return NotFound("No hay registros para esta categoría");
         }
     }
 }
