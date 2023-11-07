@@ -17,10 +17,17 @@ namespace PomaBrothers.Reports.Implementation
         #region OrdersDateRange
         public async Task<List<DeliveryDetail>> OrdersByDateRangeReport(DateTime startDate, DateTime endDate)
         {
-            DateTime start = new DateTime(startDate.Year, startDate.Day, startDate.Month);
-            DateTime end = new DateTime(endDate.Year, endDate.Day, endDate.Month + 1);
+            endDate = endDate.AddDays(1);
             var getItems = await _context.Items
-                .Where(i => i.RegisterDate.CompareTo(start) >= 0 && i.RegisterDate.CompareTo(end) < 0 && i.Status != 0)
+                .Where(i => i.RegisterDate >= startDate && i.RegisterDate <= endDate && i.Status != 0)
+                .Select(i => new Item
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    Serie = i.Serie,
+                    RegisterDate = i.RegisterDate,
+                    ModelId = i.ModelId
+                })
                 .ToListAsync();
             var modelsWithItems = GetModels(getItems);
             return GetItemsWithPurchasePrices(modelsWithItems);
@@ -46,6 +53,7 @@ namespace PomaBrothers.Reports.Implementation
                     Id = i.Id,
                     Name = i.Name,
                     Serie = i.Serie,
+                    RegisterDate = i.RegisterDate,
                     ItemModel = new ItemModel
                     {
                         ModelName = im.ModelName,

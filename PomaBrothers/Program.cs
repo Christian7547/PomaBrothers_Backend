@@ -24,6 +24,7 @@ namespace PomaBrothers
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<IDeliveryReportsService, DeliveryReportsService>();
+            builder.Services.AddScoped<ISalesReportsService, SalesReportsService>();
 
             var app = builder.Build();
 
