@@ -53,6 +53,7 @@ namespace PomaBrothers.Controllers
             {
                 if (employee != null)
                 {
+                    employee.RegisterDate = DateTime.Now;
                     await _context.Employees.AddAsync(employee);
                     await _context.SaveChangesAsync();
                     return CreatedAtAction("NewEmployee", "Employee", employee);
