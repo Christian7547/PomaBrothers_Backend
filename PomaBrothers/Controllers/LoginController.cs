@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
@@ -16,34 +17,23 @@ namespace PomaBrothers.Controllers
             _context = context;
         }
 
-       
-
         [HttpPost]
         [Route("Login")]
-        public async Task<ActionResult<Employee>> GetEmployee(string username, string password)
+        public async Task<ActionResult<Employee>> Login(string user, string password)
         {
             if (_context.Employees == null)
             {
                 return NotFound();
             }
-            var user = await _context.Employees.ToListAsync();
 
-            Employee User = null;
+            var userEntity = await _context.Employees
+                .FirstOrDefaultAsync(e => e.User == user && e.Password == password);
 
-            foreach (var u in user)
-            {
-                if (u.User.Equals(username) && u.Password.Equals(password))
-                {
-                    User = u;
-                }
-            }
-
-            if (User == null)
+            if (userEntity == null)
             {
                 return NotFound();
             }
-
-            return User;
+            return Ok(userEntity);
         }
     }
 
