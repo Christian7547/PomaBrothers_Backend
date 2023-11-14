@@ -57,12 +57,14 @@ public partial class Employee
     public string Role { get; set; } = null!;
 
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; }
+    public DateTime RegisterDate { get; set; } = DateTime.Now;
 
     [Column("urlImage")]
     [StringLength(500)]
     [Unicode(false)]
     public string? UrlImage { get; set; }
+
+
 
     [InverseProperty("Employee")]
     public virtual ICollection<Sale>? Sales { get; set; } = new List<Sale>();

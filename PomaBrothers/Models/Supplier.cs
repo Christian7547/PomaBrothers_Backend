@@ -40,5 +40,5 @@ public partial class Supplier
     public string Ci { get; set; } = null!;
 
     [Column("registerDate", TypeName = "datetime")]
-    public DateTime RegisterDate { get; set; }
+    public DateTime RegisterDate { get; set; } = DateTime.Now;
 }
