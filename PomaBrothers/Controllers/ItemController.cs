@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
+using PomaBrothers.Models.DTOModels;
 
 namespace PomaBrothers.Controllers
 {
@@ -82,6 +83,19 @@ namespace PomaBrothers.Controllers
                 }
             }
             return NotFound();
+        }
+
+        [HttpGet, Route("SearchProduct/{likeProduct}")]
+        public async Task<ActionResult<List<ProductSearchDTO>>> SearchModel([FromRoute]string likeProduct)
+        {
+            var results = await _context.Items.Where(i => i.Name.Contains(likeProduct))
+                .Select(item => new ProductSearchDTO
+                {
+                    ProductId = item.Id,
+                    ProductName = item.Name
+                })
+                .ToListAsync();
+            return Ok(results);
         }
 
         [HttpGet]

@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
-using Firebase.Auth;
-using Firebase.Storage;
 
 namespace PomaBrothers.Controllers
 {
@@ -23,105 +21,104 @@ namespace PomaBrothers.Controllers
             _context = context;
         }
 
-        // GET: api/Employee
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        [Route("GetMany")]
+        public async Task<ActionResult<List<Employee>>> GetMany()
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            return await _context.Employees.ToListAsync();
+            var employees = await _context.Employees.ToListAsync();
+            if (employees != null)
+            {
+                return Ok(employees);
+            }
+            return Ok("No employees found");
         }
 
-        // GET: api/Employee/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        [HttpGet]
+        [Route("GetOne/{id:int}")]
+        public async Task<ActionResult<Employee>> GetOne([FromRoute] int id)
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
+            var employee = await FindById(id);
+            if (employee != null)
             {
-                return NotFound();
+                return Ok(employee);
             }
-
-            return employee;
+            return BadRequest();
         }
 
-        // PUT: api/Employee/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        [HttpPost]
+        [Route("NewEmployee")]
+        public async Task<IActionResult> NewEmployee([FromBody] Employee employee)
         {
-            if (id != employee.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(employee).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                if (employee != null)
+                {
+                    employee.RegisterDate = DateTime.Now;
+                    await _context.Employees.AddAsync(employee);
+                    await _context.SaveChangesAsync();
+                    return CreatedAtAction("NewEmployee", "Employee", employee);
+                }
+                throw new Exception("Internal server error");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!EmployeeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
-            return NoContent();
         }
 
-        // POST: api/Employee
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        [HttpPut]
+        [Route("EditEmployee")]
+        public async Task<IActionResult> EditEmployee([FromBody] Employee employee)
         {
-            
-            if (_context.Employees == null)
+            try
             {
-                return Problem("Entity set 'PomaBrothersDbContext.Employees'  is null.");
-            }
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-            
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
-        }
+                var employeeFound = await FindById(employee.Id);
+                if (employeeFound != null)
+                {
+                    // The RegisterDate cannot be changed
+                    employee.RegisterDate = employeeFound.RegisterDate;
 
-        // DELETE: api/Employee/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            if (_context.Employees == null)
-            {
+                    // Update the properties of the existing entity with the values of the 'employee' object
+                    _context.Entry(employeeFound).CurrentValues.SetValues(employee);
+
+                    await _context.SaveChangesAsync();
+                    return NoContent();
+                }
                 return NotFound();
             }
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool EmployeeExists(int id)
+        [HttpDelete]
+        [Route("RemoveEmployee/{id:int}")]
+        public async Task<IActionResult> RemoveEmployee([FromRoute] int id)
         {
-            return (_context.Employees?.Any(e => e.Id == id)).GetValueOrDefault();
+            try
+            {
+                var employeeFound = await FindById(id);
+                if (employeeFound != null)
+                {
+                    _context.Employees.Remove(employeeFound);
+                    await _context.SaveChangesAsync();
+                    return NoContent();
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<Employee> FindById(int id)
+        {
+            var employee = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+            return employee;
         }
     }
 }

@@ -34,5 +34,47 @@ namespace PomaBrothers.Controllers
                 .ToListAsync();
             return sales;
         }
+
+        [HttpPost]
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromBody] Sale saleCreateModel)
+        {
+            if (saleCreateModel == null)
+            {
+                return BadRequest("Los datos de venta son nulos");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Aquí puedes realizar validaciones adicionales si es necesario
+
+            try
+            {
+                // Crear una instancia de Sale a partir de SaleCreateModel
+                var sale = new Sale
+                {
+                    EmployeeId = saleCreateModel.EmployeeId,
+                    CustomerId = saleCreateModel.CustomerId,
+                    Total = saleCreateModel.Total,
+                    RegisterDate = DateTime.Now,
+                    // Otros campos
+                };
+
+                // Agregar la venta al contexto de datos
+                _context.Sales.Add(sale);
+
+                // Guardar los cambios en la base de datos
+                await _context.SaveChangesAsync();
+
+                return Ok(sale);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear la venta: {ex.Message}");
+            }
+        }
     }
 }
