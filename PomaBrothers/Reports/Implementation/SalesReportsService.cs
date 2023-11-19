@@ -113,8 +113,9 @@ namespace PomaBrothers.Reports.Implementation
         #region SalesByDateRange
         public async Task<List<SaleDTO>> SalesByDateRangeReport(DateTime startDate, DateTime endDate)
         {
+            DateTime newEndDate = endDate.AddDays(1);
             var salesDTO = new List<SaleDTO>();
-            var getSales = await _context.Sales.Where(s => s.RegisterDate.CompareTo(startDate) >= 0 && s.RegisterDate.CompareTo(endDate) < 0)
+            var getSales = await _context.Sales.Where(s => s.RegisterDate.CompareTo(startDate) >= 0 && s.RegisterDate.CompareTo(newEndDate) < 0)
                 .Include(details => details.SaleDetails)
                 .ToListAsync();
             foreach(var sale in getSales)
