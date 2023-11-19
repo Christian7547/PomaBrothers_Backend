@@ -31,5 +31,12 @@ namespace PomaBrothers.Controllers.Reports
                 return Ok(getSupplierProduct);
             return NotFound("No record");
         }
+
+        [HttpGet, Route("ItemsBySupplierBetweenDates")]
+        public async Task<IActionResult> ItemsBySupplierBetweenDates(int supplierId, DateTime startDate, DateTime endDate)
+        {
+            var getItemsWithSuppliers = await _deliveryReportsService.ItemsBySupplierBetweenDates(supplierId, startDate, endDate);
+            return Ok(getItemsWithSuppliers);
+        }
     }
 }

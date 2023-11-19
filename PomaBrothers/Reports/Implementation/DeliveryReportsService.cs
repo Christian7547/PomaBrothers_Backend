@@ -141,5 +141,66 @@ namespace PomaBrothers.Reports.Implementation
             return _productSupplierDTO;
         }
         #endregion
+
+        #region ItemsBySupplierBetweenDates
+        public async Task<SupplierItemsDTO> ItemsBySupplierBetweenDates(int supplierId, DateTime startDate, DateTime endDate)
+        {
+            DateTime newEndDate = endDate.AddDays(1);
+            SupplierItemsDTO supplierItems = new();
+            List<DeliveryDetail> details = new();
+
+            var getInvoices = await _context.Invoices.Join(_context.DeliveryDetails, i => i.Id, dd => dd.InvoiceId,
+                (i, dd) => new
+                {
+                    InvoiceRegisterDate = i.RegisterDate,
+                    WhoSupplier = i.SupplierId,
+                    DetailID = dd.Id,
+                    dd.ItemId,
+                    dd.PurchasePrice,
+                    i.RegisterDate
+                })
+                .Where(i => i.WhoSupplier == supplierId && i.InvoiceRegisterDate >= startDate && i.InvoiceRegisterDate <= newEndDate)
+                .ToListAsync();
+
+            supplierItems = await GetSupplierBetweenDates(getInvoices.Select(gi => gi.WhoSupplier).First(), supplierItems);
+            supplierItems.Products = new();
+            
+            foreach (var item in getInvoices)
+            {
+                var product = await GetItemAsync(item.ItemId);
+                var productModel = await GetModelAsync(product.ModelId);
+                supplierItems.Products.Add(new ProductPurchasedDTO
+                {
+                    NameProduct = product!.Name,
+                    Serie = product.Serie,
+                    PriceProduct = item.PurchasePrice,
+                    MarkerProduct = productModel.Marker,
+                    ModelNameProduct = productModel.ModelName,
+                    RegisterDateProduct = item.RegisterDate
+                });
+            }
+            return supplierItems;
+        }
+
+        public async Task<SupplierItemsDTO> GetSupplierBetweenDates(int supplierId, SupplierItemsDTO supplierItems)
+        {
+            var getSupplier = await _context.Suppliers.Where(s => s.Id == supplierId)
+                .Select(s => new Supplier
+                {
+                    BussinesName = s.BussinesName,
+                    Phone = s.Phone,
+                    Manager = s.Manager,
+                    Address = s.Address,
+                    Ci = s.Ci
+                }).FirstOrDefaultAsync();
+
+            supplierItems.BussinesNameSupplier = getSupplier.BussinesName;
+            supplierItems.PhoneSupplier = getSupplier.Phone;
+            supplierItems.ManagerSupplier = getSupplier.Manager;
+            supplierItems.AddressSupplier = getSupplier.Address;
+            supplierItems.CiSupplier = getSupplier.Ci;
+            return supplierItems;
+        }
+        #endregion
     }
 }

@@ -7,5 +7,6 @@
         public string ModelNameProduct { get; set; }
         public string MarkerProduct { get; set; }
         public decimal PriceProduct { get; set; }
+        public DateTime RegisterDateProduct { get; set; }
     }
 }
