@@ -11,5 +11,6 @@ namespace PomaBrothers.Reports.Interfaces
         Task<DeliveryDetail> GetDetails(int productId);
         Task<Supplier> GetSupplierAsync(int invoiceId);
         Task<ItemModel> GetModelAsync(int modelId);
+        Task<SupplierItemsDTO> ItemsBySupplierBetweenDates(int supplierId, DateTime startDate, DateTime endDate);
     }
 }

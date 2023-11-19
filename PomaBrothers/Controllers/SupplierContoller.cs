@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
+using PomaBrothers.Models.DTOModels;
 namespace PomaBrothers.Controllers
 {
     [Route("[controller]")]
@@ -107,6 +108,17 @@ namespace PomaBrothers.Controllers
             }
         }
 
+        [HttpGet, Route("SearchSupplier/{likeSupplier}")]
+        public async Task<IActionResult> SearchSupplier([FromRoute]string likeSupplier)
+        {
+            var results = await _context.Suppliers.Where(s => s.BussinesName.Contains(likeSupplier))
+                .Select(s => new SupplierDTO
+                {
+                    SupplierId = s.Id,
+                    SupplierBussinesName = s.BussinesName
+                }).ToListAsync();
+            return Ok(results);
+        }
 
         //busca un elemento (o registro) en la base de datos utilizando el Entity Framework Core
         [HttpGet]
