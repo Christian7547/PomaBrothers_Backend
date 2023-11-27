@@ -30,6 +30,29 @@ namespace PomaBrothers.Controllers
         }
 
         [HttpGet]
+        [Route("GetByName/{name}")]
+        public async Task<IActionResult> GetByName(string? name)
+        {
+            if (!String.IsNullOrEmpty(name))
+            {
+                var items = await _context.Items
+                    .Where(i => i.Name.Contains(name) && i.Status == 1)
+                    .Join(
+                        _context.Item_Model,
+                        i => i.ModelId,
+                        m => m.Id,
+                        (i, m) => new { i.Id, i.Name, m.Marker, i.Serie, i.Price, i.Color, i.UrlImage }
+                    ).ToListAsync();
+
+                return Ok(items);
+            }
+
+            return BadRequest();
+        }
+
+
+
+        [HttpGet]
         [Route("GetOne/{id:int}")]
         public async Task<ActionResult<Item>> GetOne(int id)
         {
@@ -100,7 +123,7 @@ namespace PomaBrothers.Controllers
         }
 
         [HttpGet]
-        [ApiExplorerSettings(IgnoreApi = true)] //Indicates that Swagger does not generate documentation for this method
+        [ApiExplorerSettings(IgnoreApi = true)] 
         public async Task<Item> FindById(int id)
         {
             var find = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
@@ -110,5 +133,7 @@ namespace PomaBrothers.Controllers
             }
             return null!;
         }
+
+
     }
 }
