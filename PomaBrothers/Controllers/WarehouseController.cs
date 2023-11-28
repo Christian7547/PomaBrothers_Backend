@@ -48,27 +48,6 @@ namespace PomaBrothers.Controllers
             return BadRequest();
         }
 
-        [HttpDelete]
-        [Route("Remove/{id:int}")]
-        public async Task<IActionResult> Remove([FromRoute]int id)
-        {
-            var warehouse = await FindById(id);
-            if(warehouse != null)
-            {
-                try
-                {
-                    _context.Warehouses.Remove(warehouse);
-                    await _context.SaveChangesAsync();
-                    return NoContent();
-                }
-                catch(Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
-            }
-            return NotFound();
-        }
-
         [HttpGet]
         [Route("GetContentWarehouse/{id:int}")]
         public async Task<ActionResult<List<Section>>> GetContentWarehouse([FromRoute]int id) //id of Warehouse
@@ -84,7 +63,7 @@ namespace PomaBrothers.Controllers
         [Route("GetItemsWarehouse/{id:int}")]
         public async Task<ActionResult<List<Item>>> GetItemsWarehouse([FromRoute]int id)//id of Model
         {
-            var query = await _context.Items.Where(i => i.ModelId.Equals(id)).ToListAsync();
+            var query = await _context.Items.Where(i => i.ModelId.Equals(id) && i.Status.Equals(1)).ToListAsync();
             if(query.Count > 0)
             {
                 return Ok(query);
