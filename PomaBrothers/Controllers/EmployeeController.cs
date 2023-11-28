@@ -57,6 +57,7 @@ namespace PomaBrothers.Controllers
                 {
                     employee.Password = GetSHA256(employee.Password);
                     employee.RegisterDate = DateTime.Now;
+                    employee.Status = 1;
                     await _context.Employees.AddAsync(employee);
                     await _context.SaveChangesAsync();
                     return CreatedAtAction("NewEmployee", "Employee", employee);

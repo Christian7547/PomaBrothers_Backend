@@ -52,6 +52,7 @@ namespace PomaBrothers.Controllers
             {
                 if (supplier != null)
                 {
+                    supplier.Status = 1;
                     await _context.Suppliers.AddAsync(supplier);
                     await _context.SaveChangesAsync();
                     return CreatedAtAction("NewSupplier", "Supplier", supplier);
