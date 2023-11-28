@@ -109,7 +109,8 @@ namespace PomaBrothers.Controllers
             var getSections = await _context.Sections.Where(s => s.ModelId.Equals(model)).FirstOrDefaultAsync();
             if (getSections != null)
             {
-                getSections.ModelQuantity--;
+                if(getSections.ModelQuantity > 0)
+                    getSections.ModelQuantity--;
                 _context.Entry(getSections).State = EntityState.Modified;
             }
             await _context.SaveChangesAsync();
