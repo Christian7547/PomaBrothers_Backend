@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PomaBrothers.Data;
 using PomaBrothers.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PomaBrothers.Controllers
 {
@@ -26,6 +28,7 @@ namespace PomaBrothers.Controllers
                 return NotFound();
             }
 
+            password = GetSHA256(password);
             var userEntity = await _context.Employees
                 .FirstOrDefaultAsync(e => e.User == user && e.Password == password);
 
@@ -35,7 +38,17 @@ namespace PomaBrothers.Controllers
             }
             return Ok(userEntity);
         }
-    }
 
-    
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private string GetSHA256(string str)
+        {
+            SHA256 sha256 = SHA256.Create();
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] stream = null!;
+            StringBuilder sb = new StringBuilder();
+            stream = sha256.ComputeHash(encoding.GetBytes(str));
+            for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
+            return sb.ToString();
+        }
+    }
 }
