@@ -30,7 +30,7 @@ namespace PomaBrothers.Controllers
 
             password = GetSHA256(password);
             var userEntity = await _context.Employees
-                .FirstOrDefaultAsync(e => e.User == user && e.Password == password);
+                .FirstOrDefaultAsync(e => e.User == user && e.Password == password && e.Status.Equals(1));
 
             if (userEntity == null)
             {
