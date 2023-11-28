@@ -68,7 +68,7 @@ namespace PomaBrothers.Controllers
             {
                 await _context.Sales.AddAsync(sale);
                 await _context.SaveChangesAsync();
-                foreach (var item  in saleDetailDTO.ProductSaled)
+                foreach (var item in saleDetailDTO.ProductSaled)
                 {
                     SaleDetail product = new SaleDetail();
                     product.IdItem = item.ProductId;
@@ -82,7 +82,8 @@ namespace PomaBrothers.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return Ok(saleDetails);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 return BadRequest(ex.Message);
