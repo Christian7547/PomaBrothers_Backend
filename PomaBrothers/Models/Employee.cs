@@ -51,6 +51,9 @@ public partial class Employee
     [Unicode(false)]
     public string Password { get; set; } = null!;
 
+    [Column("status")]
+    public byte Status { get; set; }
+
     [Column("role")]
     [StringLength(15)]
     [Unicode(false)]

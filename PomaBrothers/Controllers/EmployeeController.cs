@@ -25,14 +25,14 @@ namespace PomaBrothers.Controllers
 
         [HttpGet]
         [Route("GetMany")]
-        public async Task<ActionResult<List<Employee>>> GetMany()
+        public async Task<IActionResult> GetMany()
         {
-            var employees = await _context.Employees.ToListAsync();
-            if (employees != null)
+            List<Employee> employees = await _context.Employees.Where(i => i.Status.Equals(1)).ToListAsync();
+            if (employees.Count == 0)
             {
-                return Ok(employees);
+                return BadRequest();
             }
-            return Ok("No employees found");
+            return Ok(employees);
         }
 
         [HttpGet]
@@ -99,21 +99,22 @@ namespace PomaBrothers.Controllers
         [Route("RemoveEmployee/{id:int}")]
         public async Task<IActionResult> RemoveEmployee([FromRoute] int id)
         {
-            try
+            var getEmployee = await FindById(id);
+            if (getEmployee != null)
             {
-                var employeeFound = await FindById(id);
-                if (employeeFound != null)
+                try
                 {
-                    _context.Employees.Remove(employeeFound);
+                    getEmployee.Status = 0;
+                    _context.Entry(getEmployee).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
-                return NotFound();
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return NotFound();
         }
 
         [HttpGet]
