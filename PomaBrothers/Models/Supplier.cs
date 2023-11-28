@@ -31,6 +31,9 @@ public partial class Supplier
     [Unicode(false)]
     public string Address { get; set; } = null!;
 
+    [Column("status")]
+    public byte Status { get; set; }
+
     /// <summary>
     /// Carnet de identidad
     /// </summary>

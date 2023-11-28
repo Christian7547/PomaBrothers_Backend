@@ -21,14 +21,14 @@ namespace PomaBrothers.Controllers
 
         [HttpGet]
         [Route("GetMany")]
-        public async Task<ActionResult<List<Supplier>>> GetMany()
+        public async Task<IActionResult> GetMany()
         {
-            var query = await _context.Suppliers.ToListAsync();
-            if (query != null)
+            List<Supplier> suppliers = await _context.Suppliers.Where(i => i.Status.Equals(1)).ToListAsync();
+            if (suppliers.Count == 0)
             {
-                return Ok(query);
+                return BadRequest();
             }
-            return Ok("No logs");
+            return Ok(suppliers);
         }
 
         [HttpGet]
@@ -86,26 +86,27 @@ namespace PomaBrothers.Controllers
             }
         }
 
+
         [HttpDelete]
         [Route("RemoveSupplier/{id:int}")]
         public async Task<IActionResult> Remove([FromRoute] int id)
         {
-            try
+            var getSupplier = await FindById(id);
+            if (getSupplier != null)
             {
-                var Idfound = await FindById(id);
-                if (Idfound != null)
+                try
                 {
-                    _context.Suppliers.Remove(Idfound);
+                    getSupplier.Status = 0;
+                    _context.Entry(getSupplier).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
-                return NotFound();
-
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return NotFound();
         }
 
         [HttpGet, Route("SearchSupplier/{likeSupplier}")]
