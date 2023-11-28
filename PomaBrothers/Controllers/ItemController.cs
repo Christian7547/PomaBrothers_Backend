@@ -111,7 +111,7 @@ namespace PomaBrothers.Controllers
         [HttpGet, Route("SearchProduct/{likeProduct}")]
         public async Task<ActionResult<List<ProductSearchDTO>>> SearchModel([FromRoute]string likeProduct)
         {
-            var results = await _context.Items.Where(i => i.Name.Contains(likeProduct) || i.Serie.Contains(likeProduct))
+            var results = await _context.Items.Where(i => i.Name.Contains(likeProduct) || i.Serie.Contains(likeProduct) && i.Status.Equals(1))
                 .Select(item => new ProductSearchDTO
                 {
                     ProductId = item.Id,

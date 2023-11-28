@@ -113,7 +113,7 @@ namespace PomaBrothers.Controllers
         [HttpGet, Route("SearchSupplier/{likeSupplier}")]
         public async Task<IActionResult> SearchSupplier([FromRoute]string likeSupplier)
         {
-            var results = await _context.Suppliers.Where(s => s.BussinesName.Contains(likeSupplier))
+            var results = await _context.Suppliers.Where(s => s.BussinesName.Contains(likeSupplier) && s.Status.Equals(1))
                 .Select(s => new SupplierDTO
                 {
                     SupplierId = s.Id,
