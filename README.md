@@ -1,2 +1,7 @@
 # PomaBrothers_Backend
-This is the backend repository of the PomaBrothers application
+Repositorio de la aplicación backend del proyecto Electrodomésticos
+
+Integrantes:
+* Christian Gonzales Encinas
+* Yerlin Nicol Rojas Vivanco
+* Karen Poma Ticlla
